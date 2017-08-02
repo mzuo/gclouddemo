@@ -13,3 +13,5 @@
   args:
     chdir: /home/builder
 
+
+#  hal config provider appengine account edit ACCOUNT appengine-simple-app --ssh-private-key-file-path=/home/builder/.ssh/id_rsa --ssh-known-hosts-file-path=/home/builder/.ssh/known_hosts
