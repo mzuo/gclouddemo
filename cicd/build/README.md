@@ -52,3 +52,7 @@ ansible-playbook spinnaker.yml -i inventory/hosts.yml -vvv
 cd /home/builder/g/gclouddemo/cicd/build/ansible
 ansible-playbook jenkins.yml -i inventory/hosts.yml -vvv
 ```
+
+## Use Intellij Remote Host
+
+https://www.jetbrains.com/help/idea/editing-individual-files-on-remote-hosts.html

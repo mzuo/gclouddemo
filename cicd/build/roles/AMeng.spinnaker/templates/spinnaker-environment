@@ -1,5 +1,0 @@
-# {{ ansible_managed }}
-
-{% for key, value in spinnaker_environment.iteritems() %}
-{{ key|upper }}={{ value }}
-{% endfor %}

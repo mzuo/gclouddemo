@@ -1,3 +1,0 @@
-# {{ ansible_managed }}
-
-{{ spinnaker_config_echo | to_nice_yaml }}

@@ -1,3 +1,0 @@
-# {{ ansible_managed }}
-
-{{ spinnaker_config_orca | to_nice_yaml }}
