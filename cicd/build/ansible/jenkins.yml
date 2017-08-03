@@ -1,0 +1,10 @@
+---
+
+# spinnaker
+
+- hosts: jenkins
+  roles:
+    - min_python
+    - setup_gcloud
+    - jenkins
+

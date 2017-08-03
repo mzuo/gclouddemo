@@ -1,0 +1,9 @@
+---
+- name: Setup jenkins Dependencies
+  apt: name={{item}} state=present force=yes update_cache=yes
+  with_items:
+    - nginx
+
+- service:
+    name: nginx
+    state: started

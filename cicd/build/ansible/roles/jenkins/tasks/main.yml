@@ -1,0 +1,6 @@
+---
+# https://vexxhost.com/resources/tutorials/how-to-install-configure-and-use-jenkins-on-ubuntu-14-04/
+- { include: tasks/tasks_sudo.yml, become: yes, become_method: sudo }
+# - { include: tasks/tasks_builder.yml, become: yes, become_user: builder }
+# - { include: tasks/tasks_configure.yml, become: yes, become_user: builder }
+# - { include: tasks/tasks_deploy.yml, become: yes, become_user: builder }
