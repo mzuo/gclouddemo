@@ -41,5 +41,14 @@ gcloud compute --project "cicd-174318" instances create "spinnaker-manual-v1" --
 ```
 
 ```
-rsync -avHPe "ssh -i ~/.ssh/id_rsa_builder" dev/g/pso/gcdemo/gclouddemo/* builder@104.198.27.144:/home/builder/g/gcloud
+rsync -avHPe "ssh -i ~/.ssh/id_rsa_builder" dev/g/pso/gcdemo/gclouddemo/* builder@104.198.27.144:/home/builder/g/gclouddemo
+```
+
+```
+cd /home/builder/g/gclouddemo/cicd/build/ansible
+ansible-playbook spinnaker.yml -i inventory/hosts.yml -vvv
+```
+```
+cd /home/builder/g/gclouddemo/cicd/build/ansible
+ansible-playbook jenkins.yml -i inventory/hosts.yml -vvv
 ```
