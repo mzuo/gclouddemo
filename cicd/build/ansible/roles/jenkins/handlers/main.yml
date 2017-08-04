@@ -1,0 +1,23 @@
+---
+
+
+- debug:
+    msg: "check file {{ jenkins_home }}/init.groovy.d/basic-security.groovy"
+
+
+- name: jenkins_users_config
+  template:
+    src: basic-security.groovy
+    dest: "{{ jenkins_home }}/init.groovy.d/basic-security.groovy"
+    owner: "{{ jenkins_process_user }}"
+    group: "{{ jenkins_process_group }}"
+    mode: 0775
+  notify: restart jenkins
+
+- name: restart jenkins
+  service: name=jenkins state=restarted
+  become_method: sudo
+  become: yes
+
+
+

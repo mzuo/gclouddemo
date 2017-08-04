@@ -1,18 +1,24 @@
 ---
 - name: Insure temp path exists
   file:
-    path: /home/builder/sw/gcloud_sdk/install
+    path: /home/builder
     state: directory
+
+- name: check path
+  stat: path=/home/builder/gcloud/google-cloud-sdk
+  register: gsdk
 
 - name: Get URL
   get_url:
     url: https://sdk.cloud.google.com
     dest: /home/builder/sw/gcloud_sdk/install/install_command.sh
     force: yes
+  when: gsdk.stat.islnk is not defined
 
 - name: Setup Halyard
   command: bash /home/builder/sw/gcloud_sdk/install/install_command.sh --disable-prompts  --install-dir=/home/builder/gcloud
   args:
     chdir: /home/builder
+  when: gsdk.stat.islnk is not defined
 
 

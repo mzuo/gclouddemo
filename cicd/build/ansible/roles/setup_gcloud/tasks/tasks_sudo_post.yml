@@ -1,13 +1,25 @@
 ---
+- name: check path
+  stat: path=/usr/bin
+  register: gc
+
+- name: check path
+  stat: path=/usr/bin/X11
+  register: gcx
+
 - name: remove the gcloud links - X11
   file: path=/usr/bin/X11/gcloud state=absent
+  when: gcx.stat.islnk is defined
 
 - name: remove the gcloud links - /usr/bin
   file: path=/usr/bin/gcloud state=absent
+  when: gc.stat.islnk is defined
 
 
 - name: setup gcloud symlinks /usr/bin
   file: path=/usr/bin/gcloud src=/home/builder/gcloud/google-cloud-sdk/bin/gcloud state=link force=yes
+  when: gc.stat.islnk is defined
 
 - name: setup gcloud symlinks - X11
   file: path=/usr/bin/X11/gcloud src=/home/builder/gcloud/google-cloud-sdk/bin/gcloud state=link force=yes
+  when: gcx.stat.islnk is defined
