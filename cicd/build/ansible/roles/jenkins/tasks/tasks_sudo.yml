@@ -1,9 +1,17 @@
 ---
+- apt_repository:
+    repo: ppa:openjdk-r/ppa
+    state: present
+
+#
+# sudo update-alternatives --config java
+#
+
 - name: Setup jenkins Dependencies
   apt: name={{item}} state=installed force=yes update_cache=yes
   with_items:
     - wget
-    - default-jre-headless
+    - openjdk-8-jdk
     - iptables-persistent
     - daemon
     - curl
