@@ -21,8 +21,13 @@ else {
 
     hudsonRealm.createAccount('{{ jenkins_admin_username }}', '{{ jenkins_admin_password }}')
     instance.setSecurityRealm(hudsonRealm)
-
-    def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
-    instance.setAuthorizationStrategy(strategy)
-    instance.save()
 }
+
+def strategy = new hudson.security.GlobalMatrixAuthorizationStrategy()
+strategy.add(Jenkins.ADMINISTER,'authenticated')
+instance.setAuthorizationStrategy(strategy)
+
+//    def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+//    instance.setAuthorizationStrategy(strategy)
+instance.save()
+

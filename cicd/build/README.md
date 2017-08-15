@@ -56,3 +56,8 @@ ansible-playbook jenkins.yml -i inventory/hosts.yml -vvv
 ## Use Intellij Remote Host
 
 https://www.jetbrains.com/help/idea/editing-individual-files-on-remote-hosts.html
+
+
+## HTTPS - jenkins
+
+[https Jenkins](https://wiki.jenkins.io/display/JENKINS/Starting+and+Accessing+Jenkins)

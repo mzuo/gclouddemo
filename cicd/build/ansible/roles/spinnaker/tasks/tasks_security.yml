@@ -1,0 +1,26 @@
+
+
+- name: Setup SSL API
+  expect:
+    command: hal config security api ssl edit --key-alias spinnaker --keystore /home/builder/spinnaker/security/keystore.jks --keystore-password  --keystore-type jks --truststore /home/builder/spinnaker/security/keystore.jks --truststore-password  --truststore-type jks
+    chdir: /home/builder
+    responses:
+        "The password to unlock your keystore.*": "{{ spinnaker_jks_password }}"
+        "The password to unlock your truststore.*": "{{ spinnaker_jks_password }}"
+
+- name: Setup SSL API Enable
+  shell: hal config security api ssl enable
+  args:
+    chdir: /home/builder
+
+- name: Setup SSL UI
+  expect:
+    command: hal config security ui ssl edit --ssl-certificate-file /home/builder/spinnaker/security/server.crt --ssl-certificate-key-file /home/builder/spinnaker/security/server.p12 --ssl-certificate-passphrase
+    chdir: /home/builder
+    responses:
+      "The passphrase needed to unlock your SSL certificate.*": "{{ spinnaker_key_passphrase }}"
+
+- name: Setup SSL Enable
+  shell: hal config security ui ssl enable
+  args:
+    chdir: /home/builder

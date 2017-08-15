@@ -58,4 +58,4 @@
   apt:
     name: jenkins
     state: "present"
-  notify: configure default users
+  notify: jenkins_users_config

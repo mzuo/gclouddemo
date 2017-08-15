@@ -10,4 +10,6 @@
 - name: setup pip
   command: easy_install pip
 
+- name: setup pip requirements
+  command: pip install pexpect
 

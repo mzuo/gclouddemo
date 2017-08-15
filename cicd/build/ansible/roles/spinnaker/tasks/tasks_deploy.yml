@@ -1,27 +1,157 @@
 ---
+- name: Ensures Spinnaker Security Information Exists
+  file:
+    path: /home/builder/spinnaker/security
+    state: directory
+    owner: builder
+    group: builder
 
-- name: Deploy Version
-  shell: hal config version edit --version 1.1.2
+
+- name: Check if ca.crt alread exists
+  stat:
+    path: /home/builder/spinnaker/security/ca.crt
+  register: stat_results_ca_crt_file
+
+# https://www.spinnaker.io/setup/security/authentication/ssl/
+
+- name: Create the the certificate key
+  expect:
+    command: openssl genrsa -des3 -out ca.key 4096
+    chdir: /home/builder/spinnaker/security
+    responses:
+        "Enter pass phrase.*": "{{ spinnaker_key_passphrase }}"
+        "Verifying.*": "{{ spinnaker_key_passphrase }}"
+  when: stat_results_ca_crt_file.stat.exists == False
+
+- name: Create the the certificate
+  expect:
+    command: openssl req -new -x509 -days 365 -key ca.key -out ca.crt
+    chdir: /home/builder/spinnaker/security
+    responses:
+        "Enter pass phrase.*": "{{ spinnaker_key_passphrase }}"
+        "Country Name.*": "US"
+        "State or Province.*": "CA"
+        "Locality.*": "Mountain View"
+        "Organization Name.*": "GCloud Demo"
+        "Organizational Unit.*": "."
+        "Common Name.*": "gclouddemo.com"
+        "Email Address.*": "joseret@google.com"
+  when: stat_results_ca_crt_file.stat.exists == False
+
+- name: Check if server.crt alread exists
+  stat:
+    path: /home/builder/spinnaker/security/server.crt
+  register: stat_results_server_crt_file
+
+# https://www.spinnaker.io/setup/security/authentication/ssl/#server-certificate
+
+- name: Create the server certificate key
+  expect:
+    command: openssl genrsa -des3 -out server.key 4096
+    chdir: /home/builder/spinnaker/security
+    responses:
+        "Enter pass phrase.*": "{{ spinnaker_key_passphrase }}"
+        "Verifying.*": "{{ spinnaker_key_passphrase }}"
+  when: stat_results_server_crt_file.stat.exists == False
+
+- name: Create the server certificate request
+  expect:
+    command: openssl req -new -key server.key -out server.csr
+    chdir: /home/builder/spinnaker/security
+    responses:
+        "Enter pass phrase.*": "{{ spinnaker_key_passphrase }}"
+        "Country Name.*": "US"
+        "State or Province.*": "CA"
+        "Locality.*": "Mountain View"
+        "Organization Name.*": "GCloud Demo"
+        "Organizational Unit.*": "."
+        "Common Name.*": "spinnaker.cicd.clouddemo.com"
+        "Email Address.*": "joseret@google.com"
+        "A challenge.*": "{{ spinnaker_key_passphrase }}"
+        "An optional company name.*": "GCloud Demo"
+  when: stat_results_server_crt_file.stat.exists == False
+
+- name: Create the server certificate request
+  expect:
+    command: openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
+    chdir: /home/builder/spinnaker/security
+    responses:
+        "Enter pass phrase.*": "{{ spinnaker_key_passphrase }}"
+        "Country Name.*": "US"
+        "State or Province.*": "CA"
+        "Locality.*": "Mountain View"
+        "Organization Name.*": "GCloud Demo"
+        "Organizational Unit.*": "."
+        "Common Name.*": "spinnaker.cicd.clouddemo.com"
+        "Email Address.*": "joseret@google.com"
+        "A challenge.*": "{{ spinnaker_key_passphrase }}"
+        "An optional company name.*": "GCloud Demo"
+  when: stat_results_server_crt_file.stat.exists == False
+
+- name: Create the server certificate request
+  expect:
+    command: openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
+    chdir: /home/builder/spinnaker/security
+    responses:
+        "Enter pass phrase.*": "{{ spinnaker_key_passphrase }}"
+  when: stat_results_server_crt_file.stat.exists == False
+
+- name: Check if server.p12t alread exists
+  stat:
+    path: /home/builder/spinnaker/security/server.p12
+  register: stat_results_server_p12_file
+
+- name: Create the server p12
+  expect:
+    command: openssl pkcs12 -export -clcerts -in server.crt -inkey server.key -out server.p12 -name spinnaker -password pass:{{ spinnaker_jks_password }}
+    chdir: /home/builder/spinnaker/security
+    responses:
+        "Enter pass phrase.*": "{{ spinnaker_key_passphrase }}"
+  when: stat_results_server_p12_file.stat.exists == False
+
+- name: Check if keystore already exists
+  stat:
+    path: /home/builder/spinnaker/security/keystore.jks
+  register: stat_results_keystore_file
+
+- name: Create the keystore
+  expect:
+    command: keytool -keystore keystore.jks -import -trustcacerts -alias ca -file ca.crt
+    chdir: /home/builder/spinnaker/security
+    responses:
+        "Enter keystore password.*": "{{ spinnaker_jks_password }}"
+        "Re-enter new password.*": "{{ spinnaker_jks_password }}"
+        "Trust this certificate.*": "yes"
+  when: stat_results_keystore_file.stat.exists == False
+
+- name: Add cert to keystore
+  shell:  keytool -importkeystore -srckeystore server.p12 -srcstoretype pkcs12 -srcalias spinnaker -srcstorepass "{{ spinnaker_jks_password }}"  -destkeystore keystore.jks -deststoretype jks -destalias spinnaker -deststorepass "{{ spinnaker_jks_password }}" -destkeypass "{{ spinnaker_jks_password }}" --noprompt
   args:
-    chdir: /home/builder
+    chdir: /home/builder/spinnaker/security
 
-- name: Deploy Open Settings
-  shell: echo "host: 0.0.0.0" | tee ~/.hal/default/service-settings/gate.yml ~/.hal/default/service-settings/deck.yml
-  args:
-    chdir: /home/builder
-
-
-- name: Deploy Open Settings
-  shell: hal config security api edit  --override-base-url http://35.193.180.103:9000
-  args:
-    chdir: /home/builder
-
-- name: Deploy Open Settings
-  shell: hal config security ui edit  --override-base-url http://35.193.180.103:9000
-  args:
-    chdir: /home/builder
-
-- name: Deploy
-  shell: sudo hal deploy apply
-  args:
-    chdir: /home/builder
+#  when: stat_results_keystore_file.stat.exists == False
+#- name: Deploy Version
+#  shell: hal config version edit --version 1.1.2
+#  args:
+#    chdir: /home/builder
+#
+##- name: Deploy Open Settings
+##  shell: echo "host: 0.0.0.0" | tee ~/.hal/default/service-settings/gate.yml ~/.hal/default/service-settings/deck.yml
+##  args:
+##    chdir: /home/builder
+#
+#
+#- name: Deploy Open Settings
+#  shell: hal config security api edit  --override-base-url http://spinnaker.cicd.gclouddemo.com:8084
+#  args:
+#    chdir: /home/builder
+#
+#- name: Deploy Open Settings
+#  shell: hal config security ui edit  --override-base-url http://spinnaker.cicd.gclouddemo.com:9000
+#  args:
+#    chdir: /home/builder
+#
+#- name: Deploy
+#  shell: sudo hal deploy apply
+#  args:
+#    chdir: /home/builder

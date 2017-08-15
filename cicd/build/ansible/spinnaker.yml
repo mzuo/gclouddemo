@@ -3,6 +3,10 @@
 # spinnaker
 
 - hosts: spinnaker
+
+  vars:
+    spinnaker_key_passphrase: 'abcde'
+    spinnaker_jks_password: 'abcdeAbC123'
   roles:
     # - min_python
     # - setup_gcloud

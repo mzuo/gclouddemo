@@ -17,3 +17,16 @@ Cleanup username at the end [username]
 
 gcloud compute project-info add-metadata --metadata-from-file sshKeys=
 ```
+
+
+# Ansible Generate Keys
+
+[Ansible Crypto](http://docs.ansible.com/ansible/latest/list_of_crypto_modules.html)
+
+
+
+# Spinnaker Authentication
+
+[Spinnaker Authentication](https://www.spinnaker.io/setup/security/authentication/)
+
+- 

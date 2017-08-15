@@ -1,4 +1,18 @@
 ---
+
+- name: Set HTTP HOST to Local Only in Jenkins config.
+  lineinfile:
+    dest: "{{ jenkins_init_file }}"
+    regexp: '^HTTP_PORT='
+    line: 'HTTP_PORT=-1'
+
+
+- name: Set HTTP HOST to Local Only in Jenkins config.
+  lineinfile:
+    dest: "{{ jenkins_init_file }}"
+    regexp: '^HTTPS_PORT='
+    line: 'HTTPS_PORT=8443'
+
 - name: Modify variables in init file
   lineinfile:
     dest: "{{ jenkins_init_file }}"
@@ -21,13 +35,9 @@
   service: name=jenkins state=restarted
   when: jenkins_init_prefix.changed
 
-- name: Set HTTP port in Jenkins config.
-  lineinfile:
-    backrefs: yes
-    dest: "{{ jenkins_init_file }}"
-    regexp: '^{{ jenkins_http_port_param }}='
-    line: '{{ jenkins_http_port_param }}={{ jenkins_http_port }}'
-  register: jenkins_http_config
+
+
+
 
 - name: Ensure jenkins_home {{ jenkins_home }} exists
   file:

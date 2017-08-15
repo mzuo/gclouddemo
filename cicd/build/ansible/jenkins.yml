@@ -19,6 +19,8 @@
     jenkins_init_changes:
       - option: "JENKINS_JAVA_OPTIONS"
         value: "-Djenkins.install.runSetupWizard=false"
+      - option: "JENKINS_ARGS"
+        value: "--httpsPort=$HTTPS_PORT"
     jenkins_home: /var/lib/jenkins
 
   roles:
