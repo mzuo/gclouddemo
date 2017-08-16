@@ -1,0 +1,3 @@
+---
+spinnaker_key_passphrase: "{{vault_spinnaker_key_passphrase}}"
+spinnaker_jks_password: "{{vault_spinnaker_key_passphrase}}"

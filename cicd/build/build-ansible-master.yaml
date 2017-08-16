@@ -1,6 +1,0 @@
-gce:
-  project_id: cicd-174318
-  instance_names: build-ansible-master-v1
-  zone: us-central1-f
-  image:
-  machine-type:
