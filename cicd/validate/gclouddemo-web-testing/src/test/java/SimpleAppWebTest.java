@@ -17,6 +17,8 @@ public class SimpleAppWebTest {
       textToCheck = "WTF!";
     }
     try (final WebClient webClient = new WebClient()) {
+      System.out.println("version[" + version +"]");
+      System.out.println("textToCheck[" + textToCheck +"]");
       final HtmlPage page = webClient.getPage("https://appenginesimpleapp-default-" + version + "-dot-cicd-174318.appspot.com/");
 //      Assert.assertEquals("HtmlUnit – Welcome to HtmlUnit", page.getTitleText());
 
@@ -24,7 +26,7 @@ public class SimpleAppWebTest {
 //      Assert.assertTrue(pageAsXml.contains("<body class=\"composite\">"));
 
       final String pageAsText = page.asText();
-      Assert.assertTrue(pageAsText.contains("Hello, PSO - GCloud Demo!"));
+      Assert.assertTrue("Checking" + textToCheck, pageAsText.contains("Hello, PSO - GCloud Demo!"));
     }
   }
 
