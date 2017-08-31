@@ -1,0 +1,5 @@
+---
+- { include: tasks/tasks_deploy.yml, become: yes, become_user: builder }
+
+# openssl s_client -connect jenkins.cicd.gclouddemo.com:8443 | openssl x509 -text
+# openssl x509 -in jenkins/security/ca.crt -text -noout

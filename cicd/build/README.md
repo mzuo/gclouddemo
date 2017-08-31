@@ -61,3 +61,28 @@ https://www.jetbrains.com/help/idea/editing-individual-files-on-remote-hosts.htm
 ## HTTPS - jenkins
 
 [https Jenkins](https://wiki.jenkins.io/display/JENKINS/Starting+and+Accessing+Jenkins)
+
+
+## Keytool
+```
+builder@spinnaker-manual-v1:~$ ls -l /usr/bin/java
+lrwxrwxrwx 1 root root 22 Aug  2 18:15 /usr/bin/java -> /etc/alternatives/
+```
+
+```commandline
+builder@spinnaker-manual-v1:~$ ls -l /etc/alternatives/java
+lrwxrwxrwx 1 root root 46 Aug  2 18:15 /etc/alternatives/java -> /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+```
+```commandline
+builder@spinnaker-manual-v1:~$ ls -l /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/
+total 212
+lrwxrwxrwx 1 root root     46 Jul 26 12:45 blacklisted.certs -> /etc/java-8-openjdk/security/blacklisted.certs
+lrwxrwxrwx 1 root root     27 Jul 26 12:45 cacerts -> /etc/ssl/certs/java/cacerts
+lrwxrwxrwx 1 root root     40 Jul 26 12:45 java.policy -> /etc/java-8-openjdk/security/java.policy
+lrwxrwxrwx 1 root root     42 Jul 26 12:45 java.security -> /etc/java-8-openjdk/security/java.security
+-rw-r--r-- 1 root root 208199 Aug 29 16:00 jssecacerts
+-rw-r--r-- 1 root root    639 Jul 26 11:54 local_policy.jar
+lrwxrwxrwx 1 root root     36 Jul 26 12:45 nss.cfg -> /etc/java-8-openjdk/security/nss.cfg
+-rw-r--r-- 1 root root    621 Jul 26 11:54 US_export_policy.jar
+
+```

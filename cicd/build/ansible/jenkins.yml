@@ -22,9 +22,20 @@
       - option: "JENKINS_ARGS"
         value: "--httpsPort=$HTTPS_PORT"
     jenkins_home: /var/lib/jenkins
-
+    self_signed_cert_directory: /home/builder/jenkins/security
+    self_signed_cert_jks_directory: /home/builder/jenkins/security
+    self_signed_cert_info:
+        country: "US"
+        state: "CA"
+        city: "Mountain View"
+        org: "GCloud Demo"
+        orgUnit: "."
+        common: "gclouddemo.com"
+        email: "joseret@google.com"
+        host: "jenkins.cicd.gclouddemo.com"
   roles:
 #    - min_python
 #    - setup_gcloud
-    - jenkins
+    - setup_self_signed_cert
+#    - jenkins
 

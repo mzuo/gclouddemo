@@ -1,0 +1,131 @@
+---
+- name: Ensures Spinnaker Security Information Exists
+  file:
+    path: "{{self_signed_cert_directory}}"
+    state: directory
+    owner: builder
+    group: builder
+
+
+- name: Check if ca.crt alread exists
+  stat:
+    path: "{{self_signed_cert_directory}}/ca.crt"
+  register: stat_results_ca_crt_file
+
+# https://www.spinnaker.io/setup/security/authentication/ssl/
+
+- name: Create the the certificate key
+  expect:
+    command: openssl genrsa -des3 -out ca.key 4096
+    chdir: "{{self_signed_cert_directory}
+    responses:
+        "Enter pass phrase.*": "{{ self_signed_cert_key_passphrase }}"
+        "Verifying.*": "{{ self_signed_cert_key_passphrase }}"
+  when: stat_results_ca_crt_file.stat.exists == False
+
+- name: Create the the certificate
+  expect:
+    command: openssl req -new -x509 -days 365 -key ca.key -out ca.crt
+    chdir: /home/builder/spinnaker/security
+    responses:
+        "Enter pass phrase.*": "{{ self_signed_cert_key_passphrase }}"
+        "Country Name.*": "{{self_signed_cert_info.country}}"
+        "State or Province.*": "{{self_signed_cert_info.state}}"
+        "Locality.*": "{{self_signed_cert_info.city}}"
+        "Organization Name.*": "{{self_signed_cert_info.org}}"
+        "Organizational Unit.*": "{{self_signed_cert_info.orgUnit}}"
+        "Common Name.*": "{{self_signed_cert_info.host}}"
+        "Email Address.*": "{{self_signed_cert_info.email}}"
+  when: stat_results_ca_crt_file.stat.exists == False
+
+- name: Check if server.crt alread exists
+  stat:
+    path: "{{self_signed_cert_directory}}/server.crt"
+  register: stat_results_server_crt_file
+
+# https://www.spinnaker.io/setup/security/authentication/ssl/#server-certificate
+
+- name: Create the server certificate key
+  expect:
+    command: openssl genrsa -des3 -out server.key 4096
+    chdir: "{{self_signed_cert_directory}
+    responses:
+        "Enter pass phrase.*": "{{ self_signed_cert_key_passphrase }}"
+        "Verifying.*": "{{ self_signed_cert_key_passphrase }}"
+  when: stat_results_server_crt_file.stat.exists == False
+
+- name: Create the server certificate request
+  expect:
+    command: openssl req -new -key server.key -out server.csr
+    chdir: "{{self_signed_cert_directory}}"
+    responses:
+        "Enter pass phrase.*": "{{self_signed_cert_key_passphrase}}"
+        "Country Name.*": "{{self_signed_cert_info.country}}"
+        "State or Province.*": "{{self_signed_cert_info.state}}"
+        "Locality.*": "{{self_signed_cert_info.city}}"
+        "Organization Name.*": "{{self_signed_cert_info.org}}"
+        "Organizational Unit.*": "{{self_signed_cert_info.orgUnit}}"
+        "Common Name.*": "{{self_signed_cert_info.host}}"
+        "Email Address.*": "{{self_signed_cert_info.email}}"
+        "A challenge.*": "{{ self_signed_cert_key_passphrase }}"
+        "An optional company name.*": "{{self_signed_cert_info.org}}"
+  when: stat_results_server_crt_file.stat.exists == False
+
+- name: Create the server certificate request
+  expect:
+    command: openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
+    chdir: "{{self_signed_cert_directory}
+    responses:
+        "Enter pass phrase.*": "{{self_signed_cert_key_passphrase}}"
+        "Country Name.*": "{{self_signed_cert_info.country}}"
+        "State or Province.*": "{{self_signed_cert_info.state}}"
+        "Locality.*": "{{self_signed_cert_info.city}}"
+        "Organization Name.*": "{{self_signed_cert_info.org}}"
+        "Organizational Unit.*": "{{self_signed_cert_info.orgUnit}}"
+        "Common Name.*": "{{self_signed_cert_info.host}}"
+        "Email Address.*": ""{{self_signed_cert_info.email}}"
+        "A challenge.*": "{{ spinnaker_key_passphrase }}"
+        "An optional company name.*": "{{self_signed_cert_info.org}}"
+  when: stat_results_server_crt_file.stat.exists == False
+
+- name: Create the server certificate request
+  expect:
+    command: openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
+    chdir: "{{self_signed_cert_directory}
+    responses:
+        "Enter pass phrase.*": "{{ self_signed_cert_key_passphrase }}"
+  when: stat_results_server_crt_file.stat.exists == False
+
+- name: Check if server.p12t alread exists
+  stat:
+    path: /home/builder/spinnaker/security/server.p12
+  register: stat_results_server_p12_file
+
+- name: Create the server p12
+  expect:
+    command: openssl pkcs12 -export -clcerts -in server.crt -inkey server.key -out server.p12 -name spinnaker -password pass:{{ spinnaker_jks_password }}
+    chdir: "{{self_signed_cert_directory}}"
+    responses:
+        "Enter pass phrase.*": "{{ self_signed_cert_key_passphrase }}"
+  when: stat_results_server_p12_file.stat.exists == False
+
+- name: Check if keystore already exists
+  stat:
+    path: "{{self_signed_cert_directory}/keystore.jks"
+  register: stat_results_keystore_file
+
+- name: Create the keystore
+  expect:
+    command: keytool -keystore keystore.jks -import -trustcacerts -alias ca -file ca.crt
+    chdir: "{{self_signed_cert_jks_directory}}"
+    responses:
+        "Enter keystore password.*": "{{ self_signed_cert_jks_password }}"
+        "Re-enter new password.*": "{{ self_signed_cert_jks_password }}"
+        "Trust this certificate.*": "yes"
+  when: stat_results_keystore_file.stat.exists == False
+
+- name: Add cert to keystore
+  shell:  keytool -importkeystore -srckeystore server.p12 -srcstoretype pkcs12 -srcalias spinnaker -srcstorepass "{{ spinnaker_jks_password }}"  -destkeystore keystore.jks -deststoretype jks -destalias spinnaker -deststorepass "{{ spinnaker_jks_password }}" -destkeypass "{{ spinnaker_jks_password }}" --noprompt
+  args:
+    chdir: "{{self_signed_cert_jks_directory}}"
+
