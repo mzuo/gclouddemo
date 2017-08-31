@@ -21,6 +21,8 @@
         value: "-Djenkins.install.runSetupWizard=false"
       - option: "JENKINS_ARGS"
         value: "--httpsPort=$HTTPS_PORT"
+      - option: "JENKINS_ARGS"
+        value: "--httpsPort=$HTTPS_PORT"
     jenkins_home: /var/lib/jenkins
     self_signed_cert_directory: /home/builder/jenkins/security
     self_signed_cert_jks_directory: /home/builder/jenkins/security
@@ -38,4 +40,7 @@
 #    - setup_gcloud
     - setup_self_signed_cert
 #    - jenkins
+
+
+# https://github.com/hughperkins/howto-jenkins-ssl
 

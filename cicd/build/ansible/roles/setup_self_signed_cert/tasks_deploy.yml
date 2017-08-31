@@ -71,24 +71,8 @@
         "An optional company name.*": "{{self_signed_cert_info.org}}"
   when: stat_results_server_crt_file.stat.exists == False
 
-- name: Create the server certificate request
-  expect:
-    command: openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
-    chdir: "{{self_signed_cert_directory}
-    responses:
-        "Enter pass phrase.*": "{{self_signed_cert_key_passphrase}}"
-        "Country Name.*": "{{self_signed_cert_info.country}}"
-        "State or Province.*": "{{self_signed_cert_info.state}}"
-        "Locality.*": "{{self_signed_cert_info.city}}"
-        "Organization Name.*": "{{self_signed_cert_info.org}}"
-        "Organizational Unit.*": "{{self_signed_cert_info.orgUnit}}"
-        "Common Name.*": "{{self_signed_cert_info.host}}"
-        "Email Address.*": ""{{self_signed_cert_info.email}}"
-        "A challenge.*": "{{ spinnaker_key_passphrase }}"
-        "An optional company name.*": "{{self_signed_cert_info.org}}"
-  when: stat_results_server_crt_file.stat.exists == False
 
-- name: Create the server certificate request
+- name: Create the server certificate
   expect:
     command: openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
     chdir: "{{self_signed_cert_directory}
@@ -96,9 +80,9 @@
         "Enter pass phrase.*": "{{ self_signed_cert_key_passphrase }}"
   when: stat_results_server_crt_file.stat.exists == False
 
-- name: Check if server.p12t alread exists
+- name: Check if server.p12 alread exists
   stat:
-    path: /home/builder/spinnaker/security/server.p12
+    path: "{{self_signed_cert_directory}}/server.p12"
   register: stat_results_server_p12_file
 
 - name: Create the server p12
