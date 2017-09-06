@@ -1,26 +1,38 @@
-
-
-- name: Setup SSL API
+---
+- name: Apply SSL on Gate
   expect:
-    command: hal config security api ssl edit --key-alias spinnaker --keystore /home/builder/spinnaker/security/keystore.jks --keystore-password  --keystore-type jks --truststore /home/builder/spinnaker/security/keystore.jks --truststore-password  --truststore-type jks
-    chdir: /home/builder
-    responses:
-        "The password to unlock your keystore.*": "{{ spinnaker_jks_password }}"
-        "The password to unlock your truststore.*": "{{ spinnaker_jks_password }}"
+     command: sudo hal config security api ssl edit --key-alias spinnaker --keystore /home/builder/spinnaker/security/keystore.jks --keystore-password --keystore-type jks --truststore /home/builder/spinnaker/security/keystore.jks --truststore-password --truststore-type jks
+     responses: 
+       "The password to unlock your keystore.*": "{{ spinnaker_jks_password }}"
+       "The password to unlock your truststore.*": "{{ spinnaker_jks_password }}"
+- name: Enable SSL on Gate 
+  shell: sudo hal config security api ssl enable
 
-- name: Setup SSL API Enable
-  shell: hal config security api ssl enable
-  args:
-    chdir: /home/builder
-
-- name: Setup SSL UI
+- name: Apply SSL on Deck
   expect:
-    command: hal config security ui ssl edit --ssl-certificate-file /home/builder/spinnaker/security/server.crt --ssl-certificate-key-file /home/builder/spinnaker/security/server.p12 --ssl-certificate-passphrase
-    chdir: /home/builder
+    command: sudo hal config security ui ssl edit --ssl-certificate-file "/home/builder/spinnaker/security/server.crt" --ssl-certificate-key-file "/home/builder/spinnaker/security/server.key" --ssl-certificate-passphrase 
     responses:
-      "The passphrase needed to unlock your SSL certificate.*": "{{ spinnaker_key_passphrase }}"
+          "The passphrase needed to unlock your SSL certificate.*": "{{ spinnaker_serverkey_password }}"
 
-- name: Setup SSL Enable
-  shell: hal config security ui ssl enable
-  args:
-    chdir: /home/builder
+- name: Enable SSL on Deck
+  shell: sudo hal config security ui ssl enable
+
+
+- name: Apply GSuite Authentication
+  shell: sudo hal config security authn oauth2 edit --client-id "{{spinnaker_auth_clientid}}" --client-secret "{{spinnaker_auth_clientsecret}}" --provider google
+
+- name: Enable GSuite Authentication
+  shell: sudo hal config security authn oauth2 enable
+
+
+- name: Configure GSuite Authorization credential 
+  shell: sudo hal config security authz google edit --admin-username "{{spinnaker_gsuite_adminemail}}" --credential-path "{{spinnaker_gcp_authjson}}" --domain "{{spinnaker_gsuite_domain}}"
+
+- name: Configure GSuite Authorization type
+  shell: sudo hal config security authz edit --type google
+
+- name: Enable GSuite Authorization
+  shell: sudo hal config security authz enable
+
+- name: Apply Hal Deploy Apply
+  shell: sudo hal deploy apply

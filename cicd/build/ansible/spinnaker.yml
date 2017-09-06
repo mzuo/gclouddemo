@@ -6,6 +6,9 @@
 
   vars:
     spinnaker_var_placeholder: 'tbd'
+    spinnaker_gsuite_adminemail: 'mzuo@gclouddemo.com'
+    spinnaker_gsuite_domain: 'gclouddemo.com'
+    spinnaker_gcp_authjson: '/home/builder/.gce_svc.json'
 
   roles:
     # - min_python

@@ -1,3 +1,7 @@
 ---
-spinnaker_key_passphrase: "{{vault_spinnaker_key_passphrase}}"
-spinnaker_jks_password: "{{vault_spinnaker_key_passphrase}}"
+spinnaker_jks_password: "{{vault_spinnaker_jks_password}}"
+spinnaker_ca_password: "{{vault_spinnaker_ca_password}}"
+spinnaker_serverkey_password: "{{vault_spinnaker_serverkey_password}}"
+spinnaker_server_challenge: "{{vault_spinnaker_server_challenge}}"
+spinnaker_auth_clientid: "{{vault_spinnaker_auth_clientid}}"
+spinnaker_auth_clientsecret: "{{vault_spinnaker_auth_clientsecret}}"
