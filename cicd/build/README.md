@@ -52,6 +52,24 @@ ansible-playbook spinnaker.yml -i inventory/hosts.yml -vvv
 cd /home/builder/g/gclouddemo/cicd/build/ansible
 ansible-playbook jenkins.yml -i inventory/hosts.yml -vvv
 ```
+## Ansible - Spinnaker - Variables
+Following variables need to be validated and configured when the spinnaker is deployed
+### cicd/build/ansible/spinnaker.yml
+spinnaker_gsuite_adminemail - an email that has admin access to GSuite domain
+spinnaker_gcp_authjson - the path of the IAM credential on the spinnaker machine 
+spinnaker_gsuite_domain - The domain of the Gsuite
+### cicd/build/ansible/group_vars/spinnaker/vault
+To edit the vault file, use the following commands. Password is in valentine. Do not forget to add the 'vault_' variables in the vars.yml file. Refer [Ansible Vault documentation](http://docs.ansible.com/ansible/latest/playbooks_best_practices.html#best-practices-for-variables-and-vaults)   
+```
+ansible-vault decrypt vault
+ansible-vault encrypt vault
+```
+spinnaker_auth_clientid- This id is provided by GCP OAuth2 Client generation process for web application. Refer [Authentication section](https://docs.google.com/document/d/1Moh33cPndZ7E6no-nsFa7j1JJdDMJnluPS7iYKz3GqI/edit#) for more details
+spinnaker_auth_clientsecret - This secret is provided by GCP OAuth2 Client generation process for web application. Refer [Authentication section](https://docs.google.com/document/d/1Moh33cPndZ7E6no-nsFa7j1JJdDMJnluPS7iYKz3GqI/edit#) for more details
+spinnaker_jks_password - Provide a password for java keystore that will be encrypted in the ansible vault file
+spinnaker_ca_password - Provide a password for certificate authority that will be encrypted in the ansible vault file
+spinnaker_serverkey_password - Provide a password for server key that will be encrypted in the ansible vault file
+spinnaker_server_challenge - Provide a challenge for server that will be encrypted in the ansible vault file
 
 ## Use Intellij Remote Host
 
@@ -86,3 +104,4 @@ lrwxrwxrwx 1 root root     36 Jul 26 12:45 nss.cfg -> /etc/java-8-openjdk/securi
 -rw-r--r-- 1 root root    621 Jul 26 11:54 US_export_policy.jar
 
 ```
+
